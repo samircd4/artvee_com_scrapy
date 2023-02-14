@@ -30,13 +30,15 @@ class ArtVeeSpider(scrapy.Spider):
     {'type': 'modern_art', 'category': 'Pop Surrealism', 'link': 'https://artvee.com/c/modern-art/pop-surrealism/'}
     ]
     def start_requests(self):
-        for url in self.classic[:1]:
+        for url in self.classic:
             d_type = url['type']
             category = url['category']
             link = url['link']
             per_page_70 = '?per_page=70'
             link_70 = f'{link}{per_page_70}'
-            yield scrapy.Request(url=link_70, callback=self.parse, meta={'d_type':d_type, 'category': category})
+            print(category)
+            if category == 'Botanical':
+                yield scrapy.Request(url=link_70, callback=self.parse, meta={'d_type':d_type, 'category': category})
     
     def parse(self, response):
         content = response.css('h3.product-title')
