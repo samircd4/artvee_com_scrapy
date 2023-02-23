@@ -1,5 +1,5 @@
 import scrapy
-
+import pandas as pd
 
 class ArtVeeSpider(scrapy.Spider):
     name = "art_vee"
@@ -36,21 +36,30 @@ class ArtVeeSpider(scrapy.Spider):
             link = url['link']
             per_page_70 = '?per_page=70'
             link_70 = f'{link}{per_page_70}'
-            print(category)
-            if category == 'Botanical':
-                yield scrapy.Request(url=link_70, callback=self.parse, meta={'d_type':d_type, 'category': category})
+            # if category == 'Botanical':
+            file_name = f'{category}.xlsx'
+            df = pd.DataFrame()
+            df.to_excel(file_name, index=False)
+            yield scrapy.Request(url=link_70, callback=self.parse, meta={'d_type':d_type, 'category': category, 'file_name': file_name})
     
     def parse(self, response):
         content = response.css('h3.product-title')
         d_type = response.meta.get('d_type')
         category = response.meta.get('category')
-        print(d_type , category)
+        file_name = response.meta.get('file_name')
+        df = pd.read_excel(file_name)
         for c in content:
-            title = c.css('a::text').get()
+            title_en = c.css('a::text').get()
+            title = title_en
             link = c.css('a::attr(href)').get()
-            yield {'type':d_type, 'category':category, 'title': title, 'link': link}
+            data = {'type':d_type, 'category':category, 'title': title, 'link': link}
+            df = df.append([data])
+            yield  data
+            
+        
+        df.to_excel(file_name, index=False)
         
         next_page = response.css('ul.page-numbers li a.next::attr(href)').get()
         if next_page is not None:
-            yield scrapy.Request(url= next_page, callback=self.parse, meta={'d_type':d_type, 'category': category})
+            yield scrapy.Request(url= next_page, callback=self.parse, meta={'d_type':d_type, 'category': category, 'file_name': file_name})
 
