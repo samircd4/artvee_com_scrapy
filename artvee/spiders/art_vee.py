@@ -36,11 +36,11 @@ class ArtVeeSpider(scrapy.Spider):
             link = url['link']
             per_page_70 = '?per_page=70'
             link_70 = f'{link}{per_page_70}'
-            # if category == 'Botanical':
-            file_name = f'{category}.xlsx'
-            df = pd.DataFrame()
-            df.to_excel(file_name, index=False)
-            yield scrapy.Request(url=link_70, callback=self.parse, meta={'d_type':d_type, 'category': category, 'file_name': file_name})
+            if category == 'Botanical':
+                file_name = f'{category}.xlsx'
+                df = pd.DataFrame()
+                df.to_excel(file_name, index=False)
+                yield scrapy.Request(url=link_70, callback=self.parse, meta={'d_type':d_type, 'category': category, 'file_name': file_name})
     
     def parse(self, response):
         content = response.css('h3.product-title')
