@@ -1,7 +1,8 @@
 
 # Web scraping Project from Tawhid Vai
 
-This sript will scrape artvee.com website
+This sript will scrape over 1.3 million data from artvee.com website
+
 
 
 
